@@ -66,9 +66,12 @@ print("use_cython? {0}".format(use_cython))
 if use_cython:
     ext_modules = [
         Extension(
-            name="fastlmmclib.qfc_src.wrap_qfc",
+            name="fastlmmclib.quadform.qfc_src.wrap_qfc",
             language="c++",
-            sources=["fastlmmclib/qfc_src/wrap_qfc.pyx", "fastlmmclib/qfc_src/QFC.cpp"],
+            sources=[
+                "fastlmmclib/quadform/qfc_src/wrap_qfc.pyx",
+                "fastlmmclib/quadform/qfc_src/QFC.cpp",
+            ],
             include_dirs=[numpy.get_include()],
             extra_compile_args=extra_compile_args0,
             define_macros=macros,
@@ -80,7 +83,10 @@ else:
         Extension(
             name="fastlmmclib.quadform.qfc_src.wrap_qfc",
             language="c++",
-            sources=["fastlmmclib/qfc_src/wrap_qfc.cpp", "fastlmmclib/qfc_src/QFC.cpp"],
+            sources=[
+                "fastlmmclib/quadform/qfc_src/wrap_qfc.cpp",
+                "fastlmmclib/quadform/qfc_src/QFC.cpp",
+            ],
             include_dirs=[numpy.get_include()],
             extra_compile_args=extra_compile_args0,
             define_macros=macros,
@@ -115,7 +121,8 @@ setup(
     ],
     packages=[  # basically, everything with a __init__.py
         "fastlmmclib",
-        "fastlmmclib/qfc_src",
+        "fastlmmclib/quadform",
+        "fastlmmclib/quadform/qfc_src",
     ],
     package_data={},
     install_requires=[],
