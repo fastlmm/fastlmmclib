@@ -61,7 +61,7 @@ jobs:
     - name: Test
       shell: bash -l {0}
       run: |
-        pip uninstall fastlmmiolib --yes
+        pip uninstall fastlmmclib --yes
         export PYTHONPATH=${GITHUB_WORKSPACE}
         cd tests
         pytest test.py
