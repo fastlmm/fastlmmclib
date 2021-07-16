@@ -41,6 +41,23 @@ jobs:
         pip freeze
         python setup.py sdist bdist_wheel
 
+    - name: Install flake8, etc
+      run: |
+        cd bed_reader
+        pwd
+        python -m pip install --upgrade pip
+        pip install flake8 pytest black isort --upgrade
+    - name: Lint with flake8, etc
+      run: |
+        echo "flake8"
+        flake8 .
+        echo "black"
+        black --version
+        black --verbose --check .
+        echo "isort"
+        isort --check-only .
+
+
     - name: Test
       shell: bash -l {0}
       run: |
