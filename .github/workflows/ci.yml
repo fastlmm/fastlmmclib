@@ -1,0 +1,64 @@
+name: CI
+on:
+  push:
+  schedule:
+    - cron: '0 0 1 * *'
+    
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        python-version: [3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install GCC 9 on Mac
+      if: runner.os == 'macOS'
+      run: brew install gcc@9
+
+    - name: Set up Miniconda ${{ matrix.python-version }}
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+
+    - name: Build
+      shell: bash -l {0}
+      run: |
+        conda install --file conda_requirements.txt
+        conda install cython
+        conda install pip
+        pip install -r requirements.txt
+        export CC=gcc-9
+        export CXX=g++-9
+        python setup.py build_ext --inplace
+        pip freeze
+        python setup.py sdist bdist_wheel
+
+    - name: Test
+      shell: bash -l {0}
+      run: |
+        pip uninstall fastlmmiolib --yes
+        export PYTHONPATH=${GITHUB_WORKSPACE}
+        cd tests
+        pytest test.py
+
+    - name: Save Windows and Mac Wheels
+      if: matrix.os != 'ubuntu-latest'
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist/*.whl
+
+    - name: Save SDist
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist/*.tar.gz
