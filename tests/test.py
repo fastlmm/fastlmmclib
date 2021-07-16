@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from fastlmm.util.stats.quadform import qf
+from fastlmmclib.quadform.qfc_src import qf
 
 
 def test_fastlmm_qf():
