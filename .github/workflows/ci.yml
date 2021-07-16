@@ -43,7 +43,7 @@ jobs:
 
     - name: Install flake8, etc
       run: |
-        cd bed_reader
+        cd fastlmmclib
         pwd
         python -m pip install --upgrade pip
         pip install flake8 pytest black isort --upgrade

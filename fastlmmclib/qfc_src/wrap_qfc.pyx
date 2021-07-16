@@ -2,6 +2,7 @@ import numpy as np
 
 cimport numpy as np
 
+
 cdef extern from "QFC.h":
 	double _qf_swig "qf_swig"(double* lb1, int len_lb1, double* nc1, int len_nc1, int* n1, int len_n1, double sigma, double c1, int lim1, double acc, double* trace, int len_trace, int* ifault, int len_ifault)
 
