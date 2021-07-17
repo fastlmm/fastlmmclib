@@ -33,7 +33,6 @@ jobs:
       run: |
         conda install --file conda_requirements.txt
         conda install cython
-        conda install pip
         pip install -r requirements.txt
         export CC=gcc-9
         export CXX=g++-9
@@ -45,7 +44,6 @@ jobs:
       run: |
         cd fastlmmclib
         pwd
-        python -m pip install --upgrade pip
         pip install flake8 pytest black isort --upgrade
     - name: Lint with flake8, etc
       run: |
@@ -61,7 +59,6 @@ jobs:
     - name: Test
       shell: bash -l {0}
       run: |
-        pip uninstall fastlmmclib --yes
         export PYTHONPATH=${GITHUB_WORKSPACE}
         cd tests
         pytest test.py

@@ -125,7 +125,7 @@ setup(
         "fastlmmclib/quadform/qfc_src",
     ],
     package_data={},
-    install_requires=[],
+    install_requires=["numpy"],
     cmdclass=cmdclass,
     ext_modules=ext_modules,
 )
