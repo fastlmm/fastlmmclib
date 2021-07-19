@@ -13,4 +13,4 @@ requires = [
     "oldest-supported-numpy; python_version>='3.5'",
 ]
 
-build-backend = "setuptools.build_meta
+build-backend = "setuptools.build_meta"
