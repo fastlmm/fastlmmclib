@@ -1,34 +1,7 @@
 import numpy as np
 import pytest
 
-# import fastlmmclib  #!!!cmk
-# import fastlmmclib.quadform
-# import fastlmmclib.quadform.qfc_src
-# from fastlmmclib.quadform import qf
-
-# from fastlmmclib.quadform.qfc_src import wrap_qfc
-
-from fastlmmclib.quadform.qfc_src import wrap_qfc
-
-
-def qf(
-    chi2val, coeffs, dof=None, noncentrality=None, sigma=0.0, lim=1000000, acc=1e-08
-):
-    size = coeffs.shape[0]
-    if dof is None:
-        dof = np.ones(size, dtype="int32")
-        # dof = np.ones(size)
-    if noncentrality is None:
-        noncentrality = np.zeros(size)
-    ifault = np.zeros(1, dtype="int32")
-    # ifault=np.zeros(1)
-    trace = np.zeros(7)
-    # import pdb
-    # pdb.set_trace()
-    pval = 1.0 - wrap_qfc.qf(
-        coeffs, noncentrality, dof, sigma, chi2val, lim, acc, trace, ifault
-    )
-    return pval, ifault[0], trace
+from fastlmmclib.quadform import qf
 
 
 def test_fastlmm_qf():
