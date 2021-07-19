@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
+import fastlmmclib
+import fastlmmclib.quadform
+import fastlmmclib.quadform.qfc_src
 from fastlmmclib.quadform import qf
+from fastlmmclib.quadform.qfc_src import wrap_qfc
 
 
 def test_fastlmm_qf():
