@@ -22,7 +22,9 @@ jobs:
           CIBW_BUILD: "cp3{7,8,9}-*"
           CIBW_SKIP: "*-win32 *-manylinux_i686 *aarch64 *ppc64le *s390x *universal2 *arm64"
           CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: pytest --pyargs fastlmmclib          
+          CIBW_TEST_COMMAND: pytest --pyargs fastlmmclib
+          CIBW_BUILD_VERBOSITY: 2
+          CIBW_BEFORE_BUILD: "pip install numpy"
 
       - uses: actions/upload-artifact@v2
         with:
