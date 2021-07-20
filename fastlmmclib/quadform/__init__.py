@@ -1,4 +1,5 @@
 import numpy as np
+
 from fastlmmclib.quadform.qfc_src import wrap_qfc
 
 
