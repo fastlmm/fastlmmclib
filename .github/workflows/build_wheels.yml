@@ -6,6 +6,32 @@ on:
     - cron: '0 0 1 * *'
 
 jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    python-version: 3.8
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install flake8, etc
+      run: |
+        cd fastlmmclib
+        pwd
+        pip install flake8 pytest black isort --upgrade
+
+    - name: Lint with flake8, etc
+      run: |
+        echo "flake8"
+        flake8 .
+        echo "black"
+        black --version
+        black --verbose --check .
+        echo "isort"
+        isort --check-only .
+
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
