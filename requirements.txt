@@ -1,1 +1,1 @@
-numpy
+oldest-supported-numpy
