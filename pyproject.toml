@@ -5,6 +5,12 @@ multi_line_output = 3
 [tool.black]
 line-length = 88
 
+[tool.flake8]
+exclude = "./.conda"
+
+[tool.isort]
+skip = "./.conda"
+
 [build-system]
 requires = [
     "setuptools>=42",

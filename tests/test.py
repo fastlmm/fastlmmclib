@@ -5,7 +5,6 @@ from fastlmmclib.quadform import qf
 
 
 def test_fastlmm_qf():
-
     eigvals = np.array(
         [
             -6.70841876e-17,
@@ -70,5 +69,4 @@ def test_fastlmm_qf():
 
 
 if __name__ == "__main__":
-
     pytest.main([__file__])
