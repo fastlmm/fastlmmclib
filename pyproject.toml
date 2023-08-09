@@ -11,10 +11,10 @@ exclude = "./.conda"
 
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=68",
     "wheel",
     "Cython",
-    "oldest-supported-numpy; python_version>='3.5'",
+    "oldest-supported-numpy; python_version>='3.7'",
 ]
 
 build-backend = "setuptools.build_meta"
