@@ -6,7 +6,7 @@ from fastlmmclib.quadform.qfc_src import wrap_qfc
 def qf(
     chi2val, coeffs, dof=None, noncentrality=None, sigma=0.0, lim=1000000, acc=1e-08
 ):
-    coeffs = np.contiguousarray(coeffs)
+    coeffs = np.ascontiguousarray(coeffs)
     size = coeffs.shape[0]
     if dof is None:
         dof = np.ones(size, dtype="int32")
