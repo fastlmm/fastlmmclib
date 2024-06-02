@@ -12,7 +12,7 @@ from setuptools import Extension, setup
 site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Version number
-version = "0.0.4"
+version = "0.0.5b1"
 
 
 def readme():
@@ -113,11 +113,11 @@ setup(
     },
     license="Apache 2.0",
     classifiers=[
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python",
     ],
