@@ -1,6 +1,6 @@
 import os
-import shutil
 import platform
+import shutil
 import site
 import sys
 from distutils.command.clean import clean as Clean
