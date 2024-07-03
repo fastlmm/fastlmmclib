@@ -1,1 +1,1 @@
-oldest-supported-numpy
+numpy>=2.0
