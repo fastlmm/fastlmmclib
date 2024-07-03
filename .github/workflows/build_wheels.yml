@@ -1,4 +1,5 @@
 name: Build
+# This workflow is based on that of cbgen
 
 on:
   push:
@@ -43,22 +44,23 @@ jobs:
       strategy:
         matrix:
           include:
-            # - {os: macos-13, arch: x86_64, build: "*"}
-            # - {os: macos-14, arch: arm64, build: "*"}
-              - {os: windows-2022, arch: AMD64, build: "*"}
-            # - {os: ubuntu-latest, arch: x86_64, build: "*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*9-manylinux*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*0-manylinux*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*1-manylinux*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*9-musllinux*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*0-musllinux*"}
-            # - {os: ubuntu-latest, arch: aarch64, build: "*1-musllinux*"}
+            - {os: macos-13, arch: x86_64, build: "*"}
+            - {os: macos-14, arch: arm64, build: "*"}
+            - {os: windows-2022, arch: AMD64, build: "*"}
+            - {os: ubuntu-latest, arch: x86_64, build: "*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*9-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*0-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*1-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*9-musllinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*0-musllinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*1-musllinux*"}
       steps:
         - uses: actions/checkout@v3
         - uses: docker/setup-qemu-action@v3
           with:
             platforms: arm64
           if: matrix.os == 'ubuntu-latest'
+        # use MSVC instead of experimental support for NumPy built with MinGW-w64 
         - uses: TheMrMilchmann/setup-msvc-dev@v3
           if: matrix.os == 'windows-2022'
           with:
