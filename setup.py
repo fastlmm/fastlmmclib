@@ -12,7 +12,7 @@ from setuptools import Extension, setup
 site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Version number
-version = "0.0.6b1"
+version = "0.0.6b2"
 
 
 def readme():
