@@ -61,8 +61,9 @@ jobs:
           if: matrix.os == 'ubuntu-latest'
         - name: Set up MSVC environment
           if: matrix.os == 'windows-2022'
+          shell: cmd
           run: |
-            cmd /c "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+            "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
         - name: Build wheels
           run: pipx run cibuildwheel==2.19.1
           env:
