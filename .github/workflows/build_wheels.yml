@@ -62,7 +62,7 @@ jobs:
         - name: Set up MSVC environment
           if: matrix.os == 'windows-2022'
           run: |
-            call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+            cmd /c "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
         - name: Build wheels
           run: pipx run cibuildwheel==2.19.1
           env:
