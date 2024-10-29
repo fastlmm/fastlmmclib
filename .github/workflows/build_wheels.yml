@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9,<3.13"
+  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10,<3.14"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: cd / && pytest {package}/tests/test.py
   CIBW_BUILD_VERBOSITY: 2
@@ -21,7 +21,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install flake8, etc
       run: |
