@@ -14,7 +14,6 @@ env:
   CIBW_BUILD_VERBOSITY: 2
 
 jobs:
-
   Lint:
     runs-on: ubuntu-latest
 
