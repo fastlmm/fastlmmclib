@@ -11,7 +11,8 @@ env:
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9,<3.13"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: cd / && pytest {package}/tests/test.py
-  CIBW_BUILD_VERBOSITY: 2
+  CIBW_BUILD_VERBOSITY: 3
+  CIBW_SKIP: "pp*"
 
 jobs:
 
