@@ -68,7 +68,7 @@ jobs:
           with:
               arch: x64
         - name: Build wheels
-          run: pipx run cibuildwheel==2.19.1
+          run: pipx run cibuildwheel==2.21.3
           env:
             CIBW_ARCHS: ${{ matrix.arch }}
             CIBW_BUILD: ${{ matrix.build }}
