@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9,<3.13"
+  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10,<3.14"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: cd / && pytest {package}/tests/test.py
   CIBW_BUILD_VERBOSITY: 3
@@ -50,8 +50,12 @@ jobs:
             - {os: macos-14, arch: arm64, build: "*"}
             - {os: windows-2022, arch: AMD64, build: "*"}
             - {os: ubuntu-latest, arch: x86_64, build: "*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*9-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*0-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*1-manylinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*9-musllinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*0-musllinux*"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*1-musllinux*"}
       steps:
         - uses: actions/checkout@v3
         - uses: docker/setup-qemu-action@v3
