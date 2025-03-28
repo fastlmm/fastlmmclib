@@ -46,12 +46,12 @@ jobs:
         fail-fast: false
         matrix:
           include:
-            - {os: macos-13, arch: x86_64, build: "*"}
-            - {os: macos-14, arch: arm64, build: "*"}
-            - {os: windows-2022, arch: AMD64, build: "*"}
-            - {os: ubuntu-latest, arch: x86_64, build: "*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*"}
+            - {os: macos-13, arch: x86_64, build: "*", id: "macos-x86_64"}
+            - {os: macos-14, arch: arm64, build: "*", id: "macos-arm64"}
+            - {os: windows-2022, arch: AMD64, build: "*", id: "win-amd64"}
+            - {os: ubuntu-latest, arch: x86_64, build: "*", id: "linux-x86_64"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*", id: "linux-aarch64-manylinux"}
+            - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*", id: "linux-aarch64-musllinux"}
       steps:
         - uses: actions/checkout@v3
         - uses: docker/setup-qemu-action@v3
@@ -70,7 +70,7 @@ jobs:
             CIBW_BUILD: ${{ matrix.build }}
         - uses: actions/upload-artifact@v4
           with:
-            name: wheels-${{ matrix.os }}-${{ matrix.arch }}
+            name: wheels-${{ matrix.id }}
             path: wheelhouse/*.whl
 
   collect_artifacts:
@@ -81,9 +81,12 @@ jobs:
     steps:
       - name: Download artifacts from all jobs
         uses: actions/download-artifact@v4
+        with:
+          path: all_wheels
+          merge-multiple: true
 
       - name: Archive all wheels
         uses: actions/upload-artifact@v4
         with:
           name: all-wheels
-          path: "**/*.whl"            
+          path: all_wheels/**/*.whl
