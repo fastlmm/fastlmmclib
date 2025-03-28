@@ -18,56 +18,73 @@ jobs:
 
   Lint:
     runs-on: ubuntu-latest
-
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Install flake8, etc
-      run: |
-        cd fastlmmclib
-        pwd
-        pip install flake8 pytest black isort --upgrade
-
-    - name: Lint with flake8, etc
-      run: |
-        echo "flake8"
-        flake8 .
-        echo "black"
-        black --version
-        black --verbose --check .
-        echo "isort"
-        isort --check-only .
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install flake8, etc
+        run: |
+          cd fastlmmclib
+          pwd
+          pip install flake8 pytest black isort --upgrade
+      - name: Lint with flake8, etc
+        run: |
+          echo "flake8"
+          flake8 .
+          echo "black"
+          black --version
+          black --verbose --check .
+          echo "isort"
+          isort --check-only .
 
   make_wheels:
-      runs-on: ${{ matrix.os }}
-      strategy:
-        fail-fast: false
-        matrix:
-          include:
-            - {os: macos-13, arch: x86_64, build: "*"}
-            - {os: macos-14, arch: arm64, build: "*"}
-            - {os: windows-2022, arch: AMD64, build: "*"}
-            - {os: ubuntu-latest, arch: x86_64, build: "*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*"}
-            - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*"}
-      steps:
-        - uses: actions/checkout@v3
-        - uses: docker/setup-qemu-action@v3
-          with:
-            platforms: arm64
-          if: matrix.os == 'ubuntu-latest'
-        # use MSVC instead of experimental support for NumPy built with MinGW-w64 
-        - uses: TheMrMilchmann/setup-msvc-dev@v3
-          if: matrix.os == 'windows-2022'
-          with:
-              arch: x64
-        - name: Build wheels
-          run: pipx run cibuildwheel==2.21.3
-          env:
-            CIBW_ARCHS: ${{ matrix.arch }}
-            CIBW_BUILD: ${{ matrix.build }}
-        - uses: actions/upload-artifact@v3
-          with:
-            path: wheelhouse/*.whl
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: macos-13, arch: x86_64, build: "*" }
+          - {os: macos-14, arch: arm64, build: "*" }
+          - {os: windows-2022, arch: AMD64, build: "*" }
+          - {os: ubuntu-latest, arch: x86_64, build: "*" }
+          - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*" }
+          - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*" }
+    steps:
+      - name: Skip unsupported matrix entries when running with act
+        if: env.ACT
+        run: |
+          echo "Running under act with matrix: os=${{ matrix.os }}, arch=${{ matrix.arch }}, build=${{ matrix.build }}"
+          case "${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build }}" in
+            "ubuntu-latest-x86_64-"* )
+              echo "Allowed matrix for act"
+              ;;
+            *)
+              echo "Skipping matrix under act"
+              exit 78
+              ;;
+          esac
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+        if: matrix.os == 'ubuntu-latest' && !env.ACT
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        if: matrix.os == 'windows-2022' && !env.ACT
+        with:
+          arch: x64
+      - name: Build wheels
+        run: pipx run cibuildwheel==2.21.3
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BUILD: ${{ matrix.build }}
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.arch }}
+          path: wheelhouse/*.whl
+
+  collect_wheels:
+    needs: make_wheels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheel artifacts
+        uses: actions
