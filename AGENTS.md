@@ -21,21 +21,12 @@ task explicitly changes those goals.
   behavior. Validate inputs and fail clearly unless the public API explicitly
   documents another behavior.
 
-## Python 3.14 and FaST-LMM Coordination
+## Cross-Repository Release Coordination
 
-For Python 3.14 support work, read the coordination and prerequisite-release
-requirements in
-[`../FaST-LMM/specs/PYTHON_3_14_SUPPORT_SPEC.md`](../FaST-LMM/specs/PYTHON_3_14_SUPPORT_SPEC.md)
-before making changes.
-
-`fastlmmclib` must publish Python 3.14-compatible artifacts before FaST-LMM can
-complete its Python 3.14 release. Support must cover Python 3.10 through 3.14
-and every maintained platform and architecture. Keep the FaST-LMM specification
-aligned with implementation decisions that materially change dependency
-requirements, the validation matrix, artifact coverage, or the release plan.
-
-Final acceptance must install and test published artifacts rather than relying
-on an unpublished sibling checkout.
+`fastlmmclib` is released independently and is consumed by FaST-LMM. For
+coordinated compatibility releases, publish and validate its native artifacts
+before qualifying FaST-LMM, and perform final acceptance against published
+artifacts rather than an unpublished sibling checkout.
 
 ## Numerical and Native-Code Correctness
 
