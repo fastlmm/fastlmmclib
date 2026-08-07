@@ -1,0 +1,96 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful Build workflow run containing the release artifacts
+        required: true
+        type: string
+      release_tag:
+        description: Existing release tag built by that workflow run
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event.workflow_run.head_branch || inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/p/fastlmmclib
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    env:
+      BUILD_RUN_ID: ${{ github.event.workflow_run.id || inputs.build_run_id }}
+      RELEASE_TAG: ${{ github.event.workflow_run.head_branch || inputs.release_tag }}
+    steps:
+      - name: Checkout the release tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Verify the tag and successful build run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${BUILD_RUN_ID}")"
+          test "$(jq -r .status <<<"$run_json")" = completed
+          test "$(jq -r .conclusion <<<"$run_json")" = success
+          test "$(jq -r .event <<<"$run_json")" = push
+          test "$(jq -r .head_branch <<<"$run_json")" = "$RELEASE_TAG"
+          test "$(jq -r .head_sha <<<"$run_json")" = "$(git rev-parse HEAD)"
+          package_version="$(sed -n 's/^version = "\([^"]*\)"/\1/p' setup.py)"
+          test "$RELEASE_TAG" = "v${package_version}"
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+
+      - name: Download platform wheels
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: all-wheels
+          path: dist
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUILD_RUN_ID }}
+
+      - name: Download source-distribution artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: sdist-and-derived-wheel
+          path: sdist-artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUILD_RUN_ID }}
+
+      - name: Select and verify release distributions
+        shell: bash
+        run: |
+          cp sdist-artifacts/dist/*.tar.gz dist/
+          wheel_count="$(find dist -maxdepth 1 -type f -name '*.whl' | wc -l)"
+          sdist_count="$(find dist -maxdepth 1 -type f -name '*.tar.gz' | wc -l)"
+          test "$wheel_count" -eq 35
+          test "$sdist_count" -eq 1
+          test -z "$(find dist -maxdepth 1 -type f ! -name "fastlmmclib-${PACKAGE_VERSION}-*.whl" ! -name "fastlmmclib-${PACKAGE_VERSION}.tar.gz")"
+          find dist -maxdepth 1 -type f -printf '%f\n' | sort
+
+      - name: Publish distributions with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
+          attestations: true
