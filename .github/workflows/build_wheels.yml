@@ -12,7 +12,7 @@ env:
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: cd / && pytest {package}/tests/test.py
   CIBW_BUILD_VERBOSITY: 3
-  CIBW_SKIP: "cp3?-manylinux_2_5_* cp3?-manylinux_2_24_* cp3??t-* pp*"
+  CIBW_SKIP: "cp3??t-*"
 
 jobs:
 
@@ -22,7 +22,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Install flake8, etc
       run: |
@@ -53,13 +53,13 @@ jobs:
             - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*", id: "linux-aarch64-manylinux"}
             - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*", id: "linux-aarch64-musllinux"}
       steps:
-        - uses: actions/checkout@v3
-        - uses: docker/setup-qemu-action@v3
+        - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
           with:
             platforms: arm64
           if: matrix.os == 'ubuntu-latest'
         # use MSVC instead of experimental support for NumPy built with MinGW-w64 
-        - uses: TheMrMilchmann/setup-msvc-dev@v3
+        - uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9 # v4.1.0
           if: matrix.os == 'windows-2022'
           with:
               arch: x64
@@ -68,7 +68,7 @@ jobs:
           env:
             CIBW_ARCHS: ${{ matrix.arch }}
             CIBW_BUILD: ${{ matrix.build }}
-        - uses: actions/upload-artifact@v4
+        - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
           with:
             name: wheels-${{ matrix.id }}
             path: wheelhouse/*.whl
@@ -125,13 +125,13 @@ jobs:
 
     steps:
       - name: Download artifacts from all jobs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: all_wheels
           merge-multiple: true
 
       - name: Archive all wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: all-wheels
           path: all_wheels/**/*.whl
