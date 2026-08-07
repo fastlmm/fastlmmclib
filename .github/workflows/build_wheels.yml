@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
 
 env:
-  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10,<3.14"
+  CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10,<3.15"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: cd / && pytest {package}/tests/test.py
   CIBW_BUILD_VERBOSITY: 3
-  CIBW_SKIP: "cp3?-manylinux_2_5_* cp3?-manylinux_2_24_* pp*"
+  CIBW_SKIP: "cp3??t-*"
 
 jobs:
 
@@ -22,7 +22,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Install flake8, etc
       run: |
@@ -46,32 +46,77 @@ jobs:
         fail-fast: false
         matrix:
           include:
-            - {os: macos-13, arch: x86_64, build: "*", id: "macos-x86_64"}
-            - {os: macos-14, arch: arm64, build: "*", id: "macos-arm64"}
+            - {os: macos-15-intel, arch: x86_64, build: "*", id: "macos-x86_64"}
+            - {os: macos-15, arch: arm64, build: "*", id: "macos-arm64"}
             - {os: windows-2022, arch: AMD64, build: "*", id: "win-amd64"}
             - {os: ubuntu-latest, arch: x86_64, build: "*", id: "linux-x86_64"}
             - {os: ubuntu-latest, arch: aarch64, build: "*manylinux*", id: "linux-aarch64-manylinux"}
             - {os: ubuntu-latest, arch: aarch64, build: "*musllinux*", id: "linux-aarch64-musllinux"}
       steps:
-        - uses: actions/checkout@v3
-        - uses: docker/setup-qemu-action@v3
+        - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
           with:
             platforms: arm64
           if: matrix.os == 'ubuntu-latest'
         # use MSVC instead of experimental support for NumPy built with MinGW-w64 
-        - uses: TheMrMilchmann/setup-msvc-dev@v3
+        - uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9 # v4.1.0
           if: matrix.os == 'windows-2022'
           with:
               arch: x64
         - name: Build wheels
-          run: pipx run cibuildwheel==2.21.3
+          run: pipx run cibuildwheel==4.1.0
           env:
             CIBW_ARCHS: ${{ matrix.arch }}
             CIBW_BUILD: ${{ matrix.build }}
-        - uses: actions/upload-artifact@v4
+        - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
           with:
             name: wheels-${{ matrix.id }}
             path: wheelhouse/*.whl
+
+  test_sdist:
+    name: Test sdist on Python 3.14
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install uv and Python 3.14
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.12.2"
+          python-version: "3.14"
+          enable-cache: true
+
+      - name: Build source distribution
+        run: uv build --sdist --python 3.14 --no-sources --out-dir dist
+
+      - name: Build wheel from source distribution
+        run: uv build --wheel --python 3.14 --no-sources --out-dir sdist-wheel dist/*.tar.gz
+
+      - name: Create clean test environment
+        run: uv venv --python 3.14 .artifact-venv
+
+      - name: Install sdist-derived wheel and test dependencies
+        run: uv pip install --python .artifact-venv/bin/python sdist-wheel/*.whl pytest
+
+      - name: Test installed sdist-derived wheel
+        shell: bash
+        run: |
+          cd /
+          "$GITHUB_WORKSPACE/.artifact-venv/bin/python" -c "import fastlmmclib.quadform.qfc_src.wrap_qfc as extension; assert '.artifact-venv' in extension.__file__; print(extension.__file__)"
+          "$GITHUB_WORKSPACE/.artifact-venv/bin/python" -m pytest --import-mode=importlib "$GITHUB_WORKSPACE/tests/test.py"
+
+      - name: Upload source distribution and derived wheel
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sdist-and-derived-wheel
+          path: |
+            dist/*.tar.gz
+            sdist-wheel/*.whl
+          if-no-files-found: error
+          retention-days: 7
 
   collect_artifacts:
     needs: make_wheels
@@ -80,13 +125,14 @@ jobs:
 
     steps:
       - name: Download artifacts from all jobs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
+          pattern: wheels-*
           path: all_wheels
           merge-multiple: true
 
       - name: Archive all wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: all-wheels
           path: all_wheels/**/*.whl
