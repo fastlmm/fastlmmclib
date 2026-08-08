@@ -34,11 +34,14 @@ distributions.
 4. Confirm that supported Python versions and dependency bounds match the
    wheel matrix and environments actually tested.
 5. Run the complete tests and lint checks locally where practical.
-6. Build and inspect the source distribution. Confirm that it contains the C,
+6. Review `README.md`, package metadata, and user-facing links. This project
+   has no separate generated documentation site, so the README is its
+   documentation surface.
+7. Build and inspect the source distribution. Confirm that it contains the C,
    Cython, header, license, and metadata files required to build a wheel.
-7. Install and test built artifacts outside the source checkout, without the
+8. Install and test built artifacts outside the source checkout, without the
    repository on `PYTHONPATH`.
-8. Merge the reviewed change and require a successful Build run on the exact
+9. Merge the reviewed change and require a successful Build run on the exact
    `main` commit before tagging it.
 
 ## Publish
