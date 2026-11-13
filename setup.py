@@ -12,7 +12,7 @@ from setuptools import Extension, setup
 site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Version number
-version = "0.0.8"
+version = "1.0.0"
 
 
 def readme():
@@ -113,7 +113,6 @@ setup(
     },
     license="Apache 2.0",
     classifiers=[
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
@@ -127,7 +126,7 @@ setup(
         "fastlmmclib/quadform/qfc_src",
     ],
     package_data={},
-    python_requires=">=3.10",
+    python_requires=">=3.11",
     install_requires=["numpy"],
     cmdclass=cmdclass,
     ext_modules=ext_modules,

@@ -1,7 +1,24 @@
+import math
+
 import numpy as np
 import pytest
 
 from fastlmmclib.quadform import qf
+
+
+@pytest.mark.parametrize("scale", [0.5, 2.0])
+@pytest.mark.parametrize("cutoff", [0.0, 0.5, 3.0, 10.0])
+def test_scaled_chi_square_two_degrees_of_freedom(scale, cutoff):
+    # A scaled chi-square with two degrees of freedom has an exact
+    # exponential survival function, independent of the QFC implementation.
+    probability, fault, trace = qf(
+        cutoff, np.array([scale]), dof=np.array([2], dtype="int32"), acc=1e-8
+    )
+    assert fault == 0
+    assert np.isfinite(trace).all()
+    assert probability == pytest.approx(
+        math.exp(-cutoff / (2 * scale)), abs=1e-8, rel=0
+    )
 
 
 def test_fastlmm_qf():
